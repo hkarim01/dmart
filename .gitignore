@@ -1,0 +1,15 @@
+# Dependency directories
+node_modules/
+
+# dotenv environment variables file
+.env
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
