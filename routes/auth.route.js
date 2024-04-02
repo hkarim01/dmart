@@ -2,8 +2,10 @@ import express from 'express'
 import {
   registerController,
   loginController,
+  testController,
 } from '../controllers/auth.controller.js'
 import { body } from 'express-validator'
+import { isAdmin, requireSignIn } from '../middlewares/auth.middleware.js'
 
 const router = express.Router()
 
@@ -24,5 +26,7 @@ router.post(
   [body('email').isEmail(), body('password').isLength({ min: 8, max: 50 })],
   loginController
 )
+
+router.get('/test', requireSignIn, isAdmin, testController)
 
 export default router
