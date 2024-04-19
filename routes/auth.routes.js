@@ -2,7 +2,8 @@ import express from 'express'
 import {
   registerController,
   loginController,
-  testController,
+  userAuthController,
+  forgotPasswordController,
 } from '../controllers/auth.controller.js'
 import { body } from 'express-validator'
 import { isAdmin, requireSignIn } from '../middlewares/auth.middleware.js'
@@ -14,19 +15,32 @@ router.post(
   [
     body('name').isLength({ min: 3, max: 50 }),
     body('email').isEmail(),
-    body('password').isLength({ min: 8, max: 50 }),
+    body('password').isLength({ min: 8, max: 30 }),
     body('phone').isLength({ min: 11, max: 12 }),
     body('address').notEmpty(),
+    body('answer').notEmpty(),
   ],
   registerController
 )
 
 router.post(
   '/login',
-  [body('email').isEmail(), body('password').isLength({ min: 8, max: 50 })],
+  [body('email').isEmail(), body('password').isLength({ min: 8, max: 30 })],
   loginController
 )
 
-router.get('/test', requireSignIn, isAdmin, testController)
+router.post(
+  '/forgot-password',
+  [
+    body('email').isEmail(),
+    body('answer').notEmpty(),
+    body('newPassword').isLength({ min: 8, max: 30 }),
+  ],
+  forgotPasswordController
+)
+
+router.get('/user-auth', requireSignIn, userAuthController)
+
+router.get('/admin-auth', requireSignIn, isAdmin, userAuthController)
 
 export default router

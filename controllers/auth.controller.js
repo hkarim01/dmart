@@ -9,17 +9,17 @@ export const registerController = async (req, res) => {
 
     if (!errors.isEmpty()) {
       return res
-        .status(400)
+        .status(200)
         .json({ message: 'Validation error', errors: errors.array() })
     }
 
-    const { name, email, password, phone, address } = req.body
+    const { name, email, password, phone, address, answer } = req.body
 
     const existingUser = await User.findOne({ email })
 
     if (existingUser) {
       return res.status(200).send({
-        success: true,
+        success: false,
         message: 'Already registered, please Login',
       })
     }
@@ -31,6 +31,7 @@ export const registerController = async (req, res) => {
       email,
       phone,
       address,
+      answer,
       password: hashedPassword,
     })
 
@@ -57,15 +58,15 @@ export const loginController = async (req, res) => {
 
     if (!errors.isEmpty()) {
       return res
-        .status(400)
-        .json({ message: 'Invalid credentials', errors: errors.array() })
+        .status(200)
+        .send({ message: 'Invalid credentials', errors: errors.array() })
     }
 
     const { email, password } = req.body
 
     const user = await User.findOne({ email })
     if (!user) {
-      return res.status(404).send({
+      return res.status(200).send({
         success: false,
         message: 'Email is not registered',
       })
@@ -85,12 +86,13 @@ export const loginController = async (req, res) => {
 
     return res.status(200).send({
       success: true,
-      message: 'Login successfull',
+      message: 'Login successful',
       user: {
         name: user.name,
         email: user.email,
         phone: user.phone,
         address: user.address,
+        role: user.role,
       },
       token,
     })
@@ -98,12 +100,48 @@ export const loginController = async (req, res) => {
     console.log(error)
     res.status(500).send({
       success: false,
-      message: 'Error in registration',
+      message: 'Error in login',
       error,
     })
   }
 }
 
-export const testController = (req, res) => {
-  res.send({ message: 'protected route' })
+export const forgotPasswordController = async (req, res) => {
+  try {
+    const errors = validationResult(req)
+    console.log(errors)
+
+    if (!errors.isEmpty()) {
+      return res.status(200).send({
+        success: false,
+        message: 'Validation failed',
+        errors: errors.array(),
+      })
+    }
+
+    const { email, answer, newPassword } = req.body
+
+    const user = await User.findOne({ email, answer })
+
+    if (!user) {
+      return res.status(200).send({ success: false, message: 'User not found' })
+    }
+
+    const hashed = await hashPassword(newPassword)
+    await User.findByIdAndUpdate(user._id, { password: hashed })
+    return res
+      .status(200)
+      .send({ success: true, message: 'Password reset successful' })
+  } catch (error) {
+    console.log(error)
+    res.status(500).send({
+      success: false,
+      message: 'Something went wrong',
+      error,
+    })
+  }
+}
+
+export const userAuthController = (req, res) => {
+  res.status(200).send({ ok: true })
 }

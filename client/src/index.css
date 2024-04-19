@@ -88,3 +88,15 @@
   align-items: center;
   justify-content: center;
 }
+
+/* ========================================= */
+/* =========forms ========= */
+.register {
+  margin-inline: auto;
+  max-width: 500px;
+  width: 90%;
+}
+
+.input-error {
+  color: red;
+}

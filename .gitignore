@@ -13,3 +13,6 @@ node_modules/
 
 # debug
 npm-debug.log*
+
+#images uploaded
+uploads/
