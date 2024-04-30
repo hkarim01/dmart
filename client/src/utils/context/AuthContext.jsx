@@ -8,16 +8,18 @@ export const AuthProvider = ({ children }) => {
     user: null,
     token: '',
   })
+  const [authInitialized, setAuthInitialized] = useState(false)
 
   useEffect(() => {
     const data = fetchItemFromLocal('auth')
     if (data) {
       setAuth({ ...auth, user: data.user, token: data.token })
     }
+    setAuthInitialized(true)
   }, [])
 
   return (
-    <AuthContext.Provider value={[auth, setAuth]}>
+    <AuthContext.Provider value={{ auth, authInitialized, setAuth }}>
       {children}
     </AuthContext.Provider>
   )

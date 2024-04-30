@@ -1,5 +1,5 @@
 import React from 'react'
-import Helmet from 'react-helmet'
+import { Helmet, HelmetProvider } from 'react-helmet-async'
 
 const SEOHeader = ({
   title = 'dMart - shop now',
@@ -8,7 +8,7 @@ const SEOHeader = ({
   author = 'Sparrow',
 }) => {
   return (
-    <>
+    <HelmetProvider>
       <Helmet>
         <meta charset='UTF-8' />
         <meta name='description' content={description} />
@@ -16,7 +16,7 @@ const SEOHeader = ({
         <meta name='author' content={author} />
         <title>{title}</title>
       </Helmet>
-    </>
+    </HelmetProvider>
   )
 }
 

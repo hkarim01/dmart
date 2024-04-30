@@ -1,5 +1,6 @@
 import { validationResult } from 'express-validator'
 import Product from '../models/product.model.js'
+import Category from '../models/category.model.js'
 import slugify from 'slugify'
 import fs from 'fs'
 
@@ -43,6 +44,7 @@ export const createProductController = async (req, res) => {
   try {
     const { name, description, price, category, quantity, shipping } = req.body
     const photo = req.file
+    console.log(req)
 
     const errors = validationResult(req)
 
@@ -172,6 +174,131 @@ export const deleteProductController = async (req, res) => {
       success: false,
       message: 'Error in deleting the product',
       error,
+    })
+  }
+}
+
+export const productFiltersController = async (req, res) => {
+  try {
+    const { checked, radio } = req.body
+    let args = {}
+    if (checked.length > 0) args.category = checked
+    if (radio.length) args.price = { $gte: radio[0], $lte: radio[1] }
+    const products = await Product.find(args)
+    res.status(200).send({
+      success: true,
+      products,
+    })
+  } catch (error) {
+    console.log(error)
+    res.status(500).send({
+      success: false,
+      message: 'Error WHile Filtering Products',
+      error,
+    })
+  }
+}
+
+export const productCountController = async (req, res) => {
+  try {
+    const total = await Product.find({}).estimatedDocumentCount()
+    res.status(200).send({
+      success: true,
+      total,
+    })
+  } catch (error) {
+    console.log(error)
+    res.status(500).send({
+      message: 'Error in product count',
+      error,
+      success: false,
+    })
+  }
+}
+
+export const productListController = async (req, res) => {
+  try {
+    const perPage = 2
+    const page = req.params.page ? req.params.page : 1
+    const products = await Product.find({})
+      .select('-photo')
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+      .sort({ createdAt: -1 })
+    res.status(200).send({
+      success: true,
+      products,
+    })
+  } catch (error) {
+    console.log(error)
+    res.status(500).send({
+      success: false,
+      message: 'error in per page ctrl',
+      error,
+    })
+  }
+}
+
+export const searchProductController = async (req, res) => {
+  try {
+    const { keyword } = req.params
+    const resutls = await Product.find({
+      $or: [
+        { name: { $regex: keyword, $options: 'i' } },
+        { description: { $regex: keyword, $options: 'i' } },
+      ],
+    }).select('-photo')
+    res.json(resutls)
+  } catch (error) {
+    console.log(error)
+    res.status(400).send({
+      success: false,
+      message: 'Error In Search Product API',
+      error,
+    })
+  }
+}
+
+export const realtedProductController = async (req, res) => {
+  try {
+    const { pid, cid } = req.params
+    const products = await Product.find({
+      category: cid,
+      _id: { $ne: pid },
+    })
+      .select('-photo')
+      .limit(3)
+      .populate('category')
+    res.status(200).send({
+      success: true,
+      products,
+    })
+  } catch (error) {
+    console.log(error)
+    res.status(400).send({
+      success: false,
+      message: 'error while geting related product',
+      error,
+    })
+  }
+}
+
+// get product by category
+export const productCategoryController = async (req, res) => {
+  try {
+    const category = await Category.findOne({ slug: req.params.slug })
+    const products = await Product.find({ category }).populate('category')
+    res.status(200).send({
+      success: true,
+      category,
+      products,
+    })
+  } catch (error) {
+    console.log(error)
+    res.status(400).send({
+      success: false,
+      error,
+      message: 'Error While Getting products',
     })
   }
 }

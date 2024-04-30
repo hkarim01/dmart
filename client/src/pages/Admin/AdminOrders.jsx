@@ -1,17 +1,38 @@
-import React from 'react'
-import { fetchUserOrders } from '../../utils/dmart-api'
-import { useLoaderData } from 'react-router-dom'
+import React, { useState } from 'react'
 import moment from 'moment'
+import { Select } from 'antd'
+import { fetchAllOrders, updateOrderStatus } from '../../utils/dmart-api'
+import { useLoaderData } from 'react-router-dom'
+const { Option } = Select
 
-export const ordersLoader = async () => {
-  const response = await fetchUserOrders()
+export const adminOrdersLoader = async () => {
+  const response = await fetchAllOrders()
   const { orders } = response?.data
 
   return { orders }
 }
 
-const Orders = () => {
-  const { orders } = useLoaderData()
+const AdminOrders = () => {
+  const status = [
+    'payment pending',
+    'processing',
+    'shipped',
+    'deliverd',
+    'cancel',
+  ]
+  const { orders: allOrders } = useLoaderData()
+  const [orders, setOrders] = useState(allOrders)
+
+  const handleChange = async (orderId, value) => {
+    try {
+      await updateOrderStatus(orderId, value)
+      const { orders } = await adminOrdersLoader()
+      setOrders(orders)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   return (
     <>
       <h1 className='text-center'>All Orders</h1>
@@ -24,19 +45,29 @@ const Orders = () => {
                   <th scope='col'>#</th>
                   <th scope='col'>Status</th>
                   <th scope='col'>Buyer</th>
-                  <th scope='col'> Date</th>
+                  <th scope='col'> date</th>
                   <th scope='col'>Quantity</th>
-                  <th scope='col'>Amount</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td>{i + 1}</td>
-                  <td>{o?.status}</td>
+                  <td>
+                    <Select
+                      variant='borderless'
+                      onChange={(value) => handleChange(o._id, value)}
+                      defaultValue={o?.status}
+                    >
+                      {status.map((s, i) => (
+                        <Option key={i} value={s}>
+                          {s}
+                        </Option>
+                      ))}
+                    </Select>
+                  </td>
                   <td>{o?.buyer?.name}</td>
                   <td>{moment(o?.createdAt).fromNow()}</td>
                   <td>{o?.products?.length}</td>
-                  <td>{o?.amount}</td>
                 </tr>
               </tbody>
             </table>
@@ -67,4 +98,4 @@ const Orders = () => {
   )
 }
 
-export default Orders
+export default AdminOrders

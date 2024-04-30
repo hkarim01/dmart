@@ -10,8 +10,6 @@ import { body } from 'express-validator'
 
 const router = express.Router()
 
-router.get('/:slug?', categoriesController)
-
 router.post(
   '/create-category',
   body('name').notEmpty(),
@@ -34,5 +32,7 @@ router.delete(
   isAdmin,
   deleteCategoryController
 )
+
+router.get('/:slug?', categoriesController)
 
 export default router

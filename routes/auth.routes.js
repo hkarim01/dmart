@@ -4,6 +4,7 @@ import {
   loginController,
   userAuthController,
   forgotPasswordController,
+  updateProfileController,
 } from '../controllers/auth.controller.js'
 import { body } from 'express-validator'
 import { isAdmin, requireSignIn } from '../middlewares/auth.middleware.js'
@@ -42,5 +43,7 @@ router.post(
 router.get('/user-auth', requireSignIn, userAuthController)
 
 router.get('/admin-auth', requireSignIn, isAdmin, userAuthController)
+
+router.put('/profile', requireSignIn, updateProfileController)
 
 export default router

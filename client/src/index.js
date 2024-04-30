@@ -4,13 +4,21 @@ import './index.css'
 import router from './utils/router.js'
 import { RouterProvider } from 'react-router-dom'
 import reportWebVitals from './reportWebVitals'
-import { AuthProvider } from './utils/context/AuthContext.js'
+import { AuthProvider } from './utils/context/AuthContext'
+import { Toaster } from 'react-hot-toast'
+import { SearchProvider } from './utils/context/SearchContext'
+import { CartProvider } from './utils/context/CartContext.jsx'
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
 root.render(
   <React.StrictMode>
     <AuthProvider>
-      <RouterProvider router={router} />
+      <Toaster />
+      <SearchProvider>
+        <CartProvider>
+          <RouterProvider router={router} />
+        </CartProvider>
+      </SearchProvider>
     </AuthProvider>
   </React.StrictMode>
 )

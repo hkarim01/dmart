@@ -5,14 +5,18 @@ import {
   deleteProductController,
   productPhotoController,
   productsController,
+  productFiltersController,
+  productCountController,
+  productListController,
+  searchProductController,
+  realtedProductController,
+  productCategoryController,
 } from '../controllers/product.controller.js'
 import { isAdmin, requireSignIn } from '../middlewares/auth.middleware.js'
 import { body } from 'express-validator'
 import { mutlerPhotoUpload } from '../middlewares/mutler.middleware.js'
 
 const router = express.Router()
-
-router.get('/:slug?', productsController)
 
 router.post(
   '/create-product',
@@ -47,5 +51,19 @@ router.put(
 router.get('/product-photo/:pid', productPhotoController)
 
 router.delete('/delete-product/:pid', deleteProductController)
+
+router.post('/product-filters', productFiltersController)
+
+router.get('/product-count', productCountController)
+
+router.get('/product-list/:page', productListController)
+
+router.get('/:slug?', productsController)
+
+router.get('/search/:keyword', searchProductController)
+
+router.get('/related-product/:pid/:cid', realtedProductController)
+
+router.get('/product-category/:slug', productCategoryController)
 
 export default router

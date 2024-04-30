@@ -10,7 +10,7 @@ import { setItemInLocal } from '../../utils/local-storage-utils'
 const Login = () => {
   const navigate = useNavigate()
   const location = useLocation()
-  const [auth, setAuth] = useAuth()
+  const { auth, setAuth } = useAuth()
   const {
     register,
     handleSubmit,

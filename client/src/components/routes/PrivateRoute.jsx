@@ -8,7 +8,7 @@ import UserMenu from '../layout/UserMenu'
 
 const PrivateRoute = () => {
   const [ok, setOk] = useState(false)
-  const [auth] = useAuth()
+  const { auth, authInitialized } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -24,12 +24,14 @@ const PrivateRoute = () => {
       }
     }
 
-    if (auth?.token) {
-      authCheck()
-    } else {
-      navigate('/login', { state: location.pathname })
+    if (authInitialized) {
+      if (auth?.token) {
+        authCheck()
+      } else {
+        navigate('/login', { state: location.pathname })
+      }
     }
-  }, [auth?.token, location])
+  }, [auth?.token, authInitialized, location])
 
   return ok ? (
     <div className='container-fluid m-2 p-2'>

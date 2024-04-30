@@ -13,10 +13,10 @@ const getResponseReturn = (error) => {
   return error?.response?.data
 }
 
-const getHeaders = () => {
+const getHeaders = (contentType) => {
   const token = fetchItemFromLocal('auth')?.token
   const headers = {
-    'Content-Type': 'application/json',
+    'Content-Type': contentType || 'application/json',
   }
 
   if (token) {
@@ -51,9 +51,9 @@ export const apiGet = async (url) => {
  * @param body
  * @returns
  */
-export const apiPost = async (url, body) => {
+export const apiPost = async (url, body, contentType) => {
   const options = {
-    headers: getHeaders(),
+    headers: getHeaders(contentType),
   }
 
   try {
@@ -71,9 +71,9 @@ export const apiPost = async (url, body) => {
  * @param body
  * @returns
  */
-export const apiPut = async (url, body) => {
+export const apiPut = async (url, body, contentType) => {
   const options = {
-    headers: getHeaders(),
+    headers: getHeaders(contentType),
   }
 
   try {
@@ -86,7 +86,7 @@ export const apiPut = async (url, body) => {
 }
 
 /**
- * DELETE request to the Ghostnote API
+ * DELETE request to the dMart API
  * @param url - relative URL e.g. "user"
  * @param fetchOptions
  * @returns
